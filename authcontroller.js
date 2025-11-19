@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('./User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -34,3 +34,4 @@ exports.login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
