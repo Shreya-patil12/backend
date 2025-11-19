@@ -1,5 +1,5 @@
 const express = require('express');
-const routes = express.Routes();
+const routes = express.Router();
 const jobController = require('../controllers/jobController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
@@ -17,4 +17,5 @@ routes.put('/:id', authMiddleware, roleMiddleware('recruiter'), jobController.up
 routes.delete('/:id', authMiddleware, roleMiddleware('recruiter'), jobController.deleteJob);
 
 module.exports = routes;
+
 
