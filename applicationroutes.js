@@ -1,5 +1,5 @@
 const express = require('express');
-const routes = express.Routes();
+const routes = express.Router();
 const applicationController = require('../controllers/applicationController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
@@ -14,4 +14,5 @@ routes.get('/job/:jobId', authMiddleware, roleMiddleware('recruiter'), applicati
 routes.get('/my-applications', authMiddleware, roleMiddleware('student'), applicationController.getAppliedJobsForStudent);
 
 module.exports = routes;
+
 
