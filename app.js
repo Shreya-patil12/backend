@@ -4,9 +4,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 // Import your route modules
-const authRoutes = require('./routes/authroutes');
-const jobRoutes = require('./routes/jobroutes');
-const applicationRoutes = require('./routes/applicationroutes');
+const authRoutes = require('./authroutes');
+const jobRoutes = require('./jobroutes');
+const applicationRoutes = require('./applicationroutes');
+
 
 const app = express();
 
@@ -32,4 +33,5 @@ mongoose.connect(MONGO_URI)
   .catch(err => {
     console.error('Failed to connect to MongoDB:', err);
   });
+
 
