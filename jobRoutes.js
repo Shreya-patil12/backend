@@ -1,5 +1,6 @@
 const express = require('express');
 const routes = express.Router();
+
 const jobController = require('./jobcontroller');
 
 routes.post('/', jobController.createJob);
