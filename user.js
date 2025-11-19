@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('./User');
 
 // Get logged-in user's profile
 exports.getProfile = async (req, res) => {
@@ -30,3 +30,4 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
