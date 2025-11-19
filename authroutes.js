@@ -1,5 +1,6 @@
 const express = require('express');
-const routes = express.Routes();
+const routes = express.Router();  // Corrected from 'Routes()' to 'Router()'
+
 const authController = require('../controllers/authController');
 
 // Register new user
