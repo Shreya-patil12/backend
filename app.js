@@ -3,24 +3,19 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 
-// Import your route modules
 const authRoutes = require('./authroutes');
 const jobRoutes = require('./jobroutes');
 const applicationRoutes = require('./applicationroutes');
 
-
 const app = express();
 
-// Middleware
-app.use(cors()); // Enable CORS for all origins
-app.use(express.json()); // To parse incoming JSON requests
+app.use(cors());
+app.use(express.json());
 
-// Mount routes
-app.use('/api/auth', authroutes);
-app.use('/api/jobs', jobroutes);
-app.use('/api/applications', applicationroutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
-// Connect to MongoDB and start server
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
@@ -33,5 +28,3 @@ mongoose.connect(MONGO_URI)
   .catch(err => {
     console.error('Failed to connect to MongoDB:', err);
   });
-
-
