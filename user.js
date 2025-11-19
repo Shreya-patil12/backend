@@ -1,10 +1,24 @@
-const User = require('./User');
+const mongoose = require('mongoose');
+
+// Define User schema
+const userSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true }, // Store hashed password
+}, { timestamps: true });
+
+// Create User model
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
+
+// Controller functions for user profile
 
 // Get logged-in user's profile
 exports.getProfile = async (req, res) => {
   try {
-    const userId = req.user.id; // from auth middleware
-    const user = await User.findById(userId).select('-password'); // exclude password
+    const userId = req.user.id; // Assumes auth middleware sets req.user
+    const user = await User.findById(userId).select('-password'); // Exclude password from response
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json(user);
   } catch (error) {
@@ -30,4 +44,3 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
