@@ -1,7 +1,8 @@
 const express = require('express');
 const routes = express.Router();  // Corrected from 'Routes()' to 'Router()'
 
-const authController = require('../controllers/authController');
+const authController = require('./controllers/authController');
+
 
 // Register new user
 routes.post('/register', authController.register);
@@ -10,3 +11,4 @@ routes.post('/register', authController.register);
 routes.post('/login', authController.login);
 
 module.exports = routes;
+
