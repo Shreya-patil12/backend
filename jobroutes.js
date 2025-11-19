@@ -1,19 +1,20 @@
 const express = require('express');
-const router = express.Router();
+const routes = express.Routes();
 const jobController = require('../controllers/jobController');
 const authMiddleware = require('../middleware/authMiddleware');
 const roleMiddleware = require('../middleware/roleMiddleware');
 
 // List all jobs (public)
-router.get('/', jobController.listJobs);
+routes.get('/', jobController.listJobs);
 
 // Create job (recruiter only)
-router.post('/', authMiddleware, roleMiddleware('recruiter'), jobController.createJob);
+routes.post('/', authMiddleware, roleMiddleware('recruiter'), jobController.createJob);
 
 // Update job (recruiter only, their own jobs)
-router.put('/:id', authMiddleware, roleMiddleware('recruiter'), jobController.updateJob);
+routes.put('/:id', authMiddleware, roleMiddleware('recruiter'), jobController.updateJob);
 
 // Delete job (recruiter only, their own jobs)
-router.delete('/:id', authMiddleware, roleMiddleware('recruiter'), jobController.deleteJob);
+routes.delete('/:id', authMiddleware, roleMiddleware('recruiter'), jobController.deleteJob);
 
-module.exports = router;
+module.exports = routes;
+
