@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Campus Job Board</title>
+<style>
+  :root{
+  --bg:#f7f9fc;
+  --fg:#0d1b2a;
+  --muted:#556987;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --border:#e5e7eb;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:var(--fg);
+}
+
+header{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  background:#fff;
+  position:sticky;
+  top:0;
+  text-align:center;
+  z-index:10;
+}
+
+h1{
+  margin:0;
+  font-size:22px;
+  font-weight:600;
+}
+
+.wrap{
+  max-width:920px;
+  margin:auto;
+  padding:16px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  margin:10px 0;
+  animation:fadeUp 0.25s ease-out;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.grid{
+  display:grid;
+  gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+}
+
+label{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1 1 200px;   /* used in profile + admin forms */
+}
+
+input,select,button,textarea{
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font:inherit;
+  background:#fff;
+}
+
+button{
+  cursor:pointer;
+  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.primary{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+
+.primary:hover{
+  box-shadow:0 4px 10px rgba(37,99,235,0.35);
+  transform:translateY(-1px);
+}
+
+.ghost{
+  background:#fff;
+}
+
+.ghost:hover{
+  box-shadow:0 2px 6px rgba(15,23,42,0.08);
+}
+
+.muted{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.hidden{display:none}
+
+.badge{
+  display:inline-block;
+  padding:2px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  margin-right:4px;
+  background:#fff;
+}
+
+.ok{color:#0b7a37}
+.no{color:#b4231a}
+
+.hr{
+  height:1px;
+  background:var(--border);
+  margin:10px 0;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* Center headings like “Choose your role” */
+.center-block{
+  text-align:center;
+}
+
+/* Vertical + centered role buttons */
+.vertical-center{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+}
+
+/* ───────────── LOGIN PAGE LAYOUT & SPACING ─────────── */
+
+/* Vertically center login area */
+#pageStudentLogin,
+#pageAdminLogin{
+  min-height:calc(100vh - 120px); /* header space */
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* compact login card padding */
+#pageStudentLogin.card,
+#pageAdminLogin.card{
+  padding-top:18px;
+  padding-bottom:18px;
+}
+
+/* heading spacing for login */
+#pageStudentLogin h3,
+#pageAdminLogin h3{
+  margin:0 0 10px 0;
+}
+
+/* vertical compact login form */
+.form-vertical{
+  display:flex;
+  flex-direction:column;
+  gap:6px;           /* very tight spacing */
+  width:100%;
+  max-width:360px;
+  margin:0 auto;
+}
+
+/* fix .field stretching inside login */
+#pageStudentLogin .field,
+#pageAdminLogin .field{
+  flex:0 0 auto !important;
+  margin-bottom:4px;
+}
+
+/* remove row gap inside login */
+#studentLoginForm.row,
+#adminLoginForm.row{
+  gap:0;
+  margin-top:0;
+}
+
+/* ───────────── ANIMATIONS ───────────── */
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Campus Job Board</h1>
+</header>
+
+<main class="wrap">
+
+  <!-- ========== ROLE CHOICE ========== -->
+  <section id="pageRole" class="card">
+    <h3 class="center-block">Choose your role</h3>
+    <div class="vertical-center">
+      <button class="primary" id="goStudent">Student</button>
+      <button class="primary" id="goAdmin">Recruiter / Admin</button>
+      <button class="ghost" id="seed">Seed sample data</button>
+      <button class="ghost" id="wipe">Clear all data</button>
+    </div>
+  </section>
+
+  <!-- ========== STUDENT LOGIN ========== -->
+  <section id="pageStudentLogin" class="card hidden">
+    <div class="topbar">
+      <h3>Student Login</h3>
+      <button class="ghost" id="backFromStudentLogin">Back</button>
+    </div>
+    <form id="studentLoginForm" class="form-vertical">
+      <div class="field"><label>Email</label><input name="email" type="email" required></div>
+      <div class="field"><label>Password</label><input name="pass" type="password" required></div>
+      <div class="row"><button class="primary" type="submit">Login</button></div>
+    </form>
+  </section>
+
+  <!-- ========== ADMIN LOGIN ========== -->
+  <section id="pageAdminLogin" class="card hidden">
+    <div class="topbar">
+      <h3>Recruiter / Admin Login</h3>
+      <button class="ghost" id="backFromAdminLogin">Back</button>
+    </div>
+    <form id="adminLoginForm" class="form-vertical">
+      <div class="field"><label>Company Email</label><input name="email" type="email" required></div>
+      <div class="field"><label>Password</label><input name="pass" type="password" required></div>
+      <div class="row"><button class="primary" type="submit">Login</button></div>
+    </form>
+  </section>
+
+  <!-- ========== STUDENT PAGE ========== -->
+  <section id="pageStudent" class="hidden">
+    <div class="card">
+      <div class="topbar">
+        <h3>My Profile</h3>
+        <div>
+          <div id="profileSummary" class="muted" style="margin-bottom:6px;">CGPA: — | Skills: —</div>
+          <button class="ghost" id="backFromStudentMain">Back</button>
+        </div>
+      </div>
+
+      <form id="studentProfileForm" class="row">
+        <div class="field"><label>Name</label><input name="name" required placeholder="Student Name"></div>
+        <div class="field"><label>CGPA (0–10)</label><input name="cgpa" type="number" step="0.01" min="0" max="10" required></div>
+        <div class="field"><label>Skills (comma separated)</label><input name="skills" placeholder="html, css, js"></div>
+        <div class="row"><button class="primary" type="submit">Save</button></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="topbar">
+        <h3>Jobs</h3>
+        <div class="row">
+          <input id="q" placeholder="Search jobs…">
+          <select id="typeFilter">
+            <option value="">All types</option>
+            <option>Internship</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+          </select>
+          <button class="ghost" id="clearFilters">Clear</button>
+        </div>
+      </div>
+      <div id="jobList" class="grid"></div>
+      <p id="jobsEmpty" class="muted hidden">No jobs yet.</p>
+    </div>
+  </section>
+
+  <!-- ========== ADMIN PAGE ========== -->
+  <section id="pageAdmin" class="hidden">
+    <div class="card">
+      <div class="topbar">
+        <h3>Post a Job</h3>
+        <button class="ghost" id="backFromAdminMain">Back</button>
+      </div>
+
+      <form id="jobForm">
+        <div class="row">
+          <div class="field"><label>Company</label><input name="company" required></div>
+          <div class="field"><label>Role</label><input name="role" required></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Type</label>
+            <select name="type">
+              <option>Internship</option>
+              <option>Full-time</option>
+              <option>Part-time</option>
+            </select>
+          </div>
+          <div class="field"><label>Location</label><input name="location" required></div>
+          <div class="field"><label>Min CGPA</label><input name="mincgpa" type="number" step="0.01" min="0" max="10" required></div>
+        </div>
+        <div class="field"><label>Required Skills (comma separated)</label><input name="reqskills" placeholder="html, css, js"></div>
+        <div class="field"><label>Description</label><textarea name="desc" rows="3"></textarea></div>
+        <div class="row"><button class="primary" type="submit">Publish</button></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Manage Jobs</h3>
+      <div id="adminJobs" class="grid"></div>
+      <p id="adminEmpty" class="muted hidden">No job postings yet.</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ======== BASIC HELPERS ========
+  const API_BASE = ""; // e.g. "http://localhost:5000" or leave empty for same-origin
+
+  let auth = {
+    token: null,
+    user: null  // { id, name, role, cgpa, skills, ... }
+  };
+
+  // auth persistence
+  function loadAuth(){
+    const raw = localStorage.getItem("cc_auth");
+    if(!raw) return;
+    try{
+      const parsed = JSON.parse(raw);
+      if(parsed && parsed.token){
+        auth = parsed;
+      }
+    }catch(e){
+      console.error("Failed to parse auth", e);
+    }
+  }
+
+  function saveAuth(){
+    localStorage.setItem("cc_auth", JSON.stringify(auth));
+  }
+
+  function clearAuth(){
+    auth = { token:null, user:null };
+    localStorage.removeItem("cc_auth");
+  }
+
+  // generic fetch wrapper that adds JWT
+  async function apiFetch(path, options = {}){
+    const url = API_BASE + path;
+    const headers = options.headers ? {...options.headers} : {};
+
+    if (auth.token){
+      headers["Authorization"] = "Bearer " + auth.token;
+    }
+
+    if (options.body && !("Content-Type" in headers)){
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await fetch(url, {...options, headers});
+
+    if(res.status === 401){
+      // token invalid / expired
+      clearAuth();
+      alert("Session expired. Please log in again.");
+      route("pageRole");
+      throw new Error("Unauthorized");
+    }
+    return res;
+  }
+
+  const $ = id=>document.getElementById(id);
+  const show=id=>$(id).classList.remove("hidden");
+  const hide=id=>$(id).classList.add("hidden");
+
+  const normSkills = s =>
+    (Array.isArray(s) ? s : (s || ""))
+      .toString()
+      .split(",")
+      .map(x=>x.trim().toLowerCase())
+      .filter(Boolean);
+
+  function route(page){
+    ["pageRole","pageStudentLogin","pageAdminLogin","pageStudent","pageAdmin"].forEach(hide);
+    show(page);
+  }
+
+  // ======== JOB NORMALIZATION ========
+  function normalizeJob(j){
+    const rawSkills = j.reqskills || j.requiredSkills || j.skills || "";
+    return {
+      id: j.id || j._id || j.jobId || "",
+      company: j.company || j.companyName || "Company",
+      role: j.role || j.title || "Role",
+      type: j.type || j.jobType || "Internship",
+      location: j.location || j.loc || "—",
+      mincgpa: j.mincgpa ?? j.minCgpa ?? 0,
+      reqskills: normSkills(rawSkills),
+      desc: j.desc || j.description || ""
+    };
+  }
+
+  // ======== ELIGIBILITY LOGIC ========
+  function eligible(job){
+    const user = auth.user;
+    if(!user || user.role !== "student"){
+      return { ok:false, reason:"Login as student and update profile" };
+    }
+    if(user.cgpa == null){
+      return { ok:false, reason:"Add CGPA to your profile" };
+    }
+
+    const cgOK = Number(user.cgpa) >= Number(job.mincgpa || 0);
+    const req = job.reqskills || [];
+    const you = normSkills(user.skills || []);
+
+    if(!cgOK) return { ok:false, reason:CGPA below ${job.mincgpa} };
+
+    const allReq = req.every(s=>you.includes(s));
+    if(!allReq && req.length){
+      const miss = req.filter(s=>!you.includes(s)).join(", ");
+      return { ok:false, reason:Missing skills: ${miss} };
+    }
+    return { ok:true, reason:"Eligible" };
+  }
+
+  // ======== PROFILE SUMMARY ========
+  function paintProfileSummary(){
+    const el = $("profileSummary");
+    const user = auth.user;
+    if(!user || user.role !== "student"){
+      el.textContent = "CGPA: — | Skills: —";
+      return;
+    }
+    const cg = user.cgpa ?? "—";
+    const skillsList = (user.skills || []).slice(0,6).join(", ") || "—";
+    el.textContent = CGPA: ${cg} | Skills: ${skillsList};
+  }
+
+  // ======== JOB API HELPERS ========
+  async function fetchJobs(){
+    const res = await apiFetch("/api/jobs");
+    if(!res.ok){
+      throw new Error("Failed to load jobs");
+    }
+    const data = await res.json();
+    return (data || []).map(normalizeJob);
+  }
+
+  async function applyForJob(jobId){
+    try{
+      const res = await apiFetch("/api/applications/apply", {
+        method:"POST",
+        body: JSON.stringify({ jobId })
+      });
+      if(!res.ok){
+        alert("Could not apply for this job.");
+        return;
+      }
+      alert("Application submitted!");
+    }catch(err){
+      console.error(err);
+      alert("Error applying for job.");
+    }
+  }
+
+  // ======== RENDER STUDENT JOBS ========
+  async function renderStudentJobs(){
+    const list = $("jobList");
+    list.innerHTML = "";
+    $("jobsEmpty").classList.add("hidden");
+
+    let jobs;
+    try{
+      jobs = await fetchJobs();
+    }catch(err){
+      console.error(err);
+      $("jobsEmpty").classList.remove("hidden");
+      $("jobsEmpty").textContent = "Could not load jobs from server.";
+      return;
+    }
+
+    const q = $("q").value.trim().toLowerCase();
+    const type = $("typeFilter").value;
+
+    let filtered = jobs;
+    if(q){
+      filtered = filtered.filter(j =>
+        [j.company,j.role,j.location,(j.reqskills||[]).join(" "),j.desc]
+          .join(" ")
+          .toLowerCase()
+          .includes(q)
+      );
+    }
+    if(type){
+      filtered = filtered.filter(j => j.type === type);
+    }
+
+    if(!filtered.length){
+      $("jobsEmpty").classList.remove("hidden");
+      $("jobsEmpty").textContent = "No jobs match your filters.";
+      return;
+    }
+
+    filtered.forEach(j=>{
+      const e = eligible(j);
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h4>${j.role} <span class="muted">• ${j.company}</span></h4>
+        <div class="muted">Type: ${j.type} • Loc: ${j.location}</div>
+        <div class="hr"></div>
+        <div>
+          <span class="badge">Min CGPA ${j.mincgpa}</span>
+          ${(j.reqskills||[]).map(s=><span class="badge">${s}</span>).join("")}
+        </div>
+        <p class="muted">${j.desc||""}</p>
+        <div class="${e.ok?"ok":"no"}">
+          <b>${e.ok?"Eligible":"Not eligible"}</b> — ${e.reason}
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button ${e.ok ? "" : "disabled"} class="primary" onclick="applyForJob('${j.id}')">Apply</button>
+          <button class="ghost" onclick="alert('Details:\\n${j.role} @ ${j.company}\\n\\nLocation: ${j.location}\\nType: ${j.type}\\nMin CGPA: ${j.mincgpa}\\nRequired: ${(j.reqskills||[]).join(', ')||'—'}')">Details</button>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  // ======== RENDER ADMIN JOBS ========
+  async function renderAdminJobs(){
+    const box = $("adminJobs");
+    box.innerHTML = "";
+    $("adminEmpty").classList.add("hidden");
+
+    let jobs;
+    try{
+      jobs = await fetchJobs();
+    }catch(err){
+      console.error(err);
+      $("adminEmpty").classList.remove("hidden");
+      $("adminEmpty").textContent = "Could not load jobs from server.";
+      return;
+    }
+
+    if(!jobs.length){
+      $("adminEmpty").classList.remove("hidden");
+      return;
+    }
+
+    jobs.forEach(j=>{
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <h4>${j.role} <span class="muted">• ${j.company}</span></h4>
+        <div class="muted">Type: ${j.type} • Loc: ${j.location}</div>
+        <div class="hr"></div>
+        <div>
+          <span class="badge">Min CGPA ${j.mincgpa}</span>
+          ${(j.reqskills||[]).map(s=><span class="badge">${s}</span>).join("")}
+        </div>
+        <p class="muted">${j.desc||""}</p>
+        <div class="row">
+          <button class="ghost" onclick="deleteJob('${j.id}')">Delete</button>
+        </div>
+      `;
+      box.appendChild(card);
+    });
+  }
+
+  // make deleteJob visible globally
+  window.deleteJob = async id => {
+    if(!confirm("Delete this job?")) return;
+    try{
+      const res = await apiFetch(/api/jobs/${id}, { method:"DELETE" });
+      if(!res.ok){
+        alert("Could not delete job.");
+        return;
+      }
+      renderAdminJobs();
+      renderStudentJobs();
+    }catch(err){
+      console.error(err);
+      alert("Error deleting job.");
+    }
+  };
+
+  // ======== AUTH + LOGIN HANDLERS ========
+  function handleLogout(){
+    clearAuth();
+    $("jobList").innerHTML = "";
+    $("adminJobs").innerHTML = "";
+    paintProfileSummary();
+    route("pageRole");
+  }
+
+  $("goStudent").onclick = () => route("pageStudentLogin");
+  $("goAdmin").onclick   = () => route("pageAdminLogin");
+  $("backFromStudentLogin").onclick = () => route("pageRole");
+  $("backFromAdminLogin").onclick   = () => route("pageRole");
+  $("backFromStudentMain").onclick  = handleLogout;
+  $("backFromAdminMain").onclick    = handleLogout;
+
+  $("studentLoginForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target;
+    try{
+      const res = await apiFetch("/api/auth/login", {
+        method:"POST",
+        body: JSON.stringify({
+          email: f.email.value,
+          password: f.pass.value,
+          role: "student"
+        })
+      });
+      if(!res.ok){
+        alert("Student login failed.");
+        return;
+      }
+      const data = await res.json(); // { token, user }
+      auth = { token:data.token, user:data.user };
+      saveAuth();
+      route("pageStudent");
+      paintProfileSummary();
+      renderStudentJobs();
+    }catch(err){
+      console.error(err);
+      alert("Could not reach server for student login.");
+    }
+  };
+
+  $("adminLoginForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target;
+    try{
+      const res = await apiFetch("/api/auth/login", {
+        method:"POST",
+        body: JSON.stringify({
+          email: f.email.value,
+          password: f.pass.value,
+          role: "admin"
+        })
+      });
+      if(!res.ok){
+        alert("Admin login failed.");
+        return;
+      }
+      const data = await res.json(); // { token, user }
+      auth = { token:data.token, user:data.user };
+      saveAuth();
+      route("pageAdmin");
+      renderAdminJobs();
+    }catch(err){
+      console.error(err);
+      alert("Could not reach server for admin login.");
+    }
+  };
+
+  // ======== STUDENT PROFILE SAVE ========
+  $("studentProfileForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target;
+    const body = {
+      name: f.name.value.trim(),
+      cgpa: Number(f.cgpa.value || 0),
+      skills: normSkills(f.skills.value)
+    };
+    try{
+      const res = await apiFetch("/api/student/profile", {
+        method:"PUT",
+        body: JSON.stringify(body)
+      });
+      if(!res.ok){
+        alert("Could not update profile.");
+        return;
+      }
+      const updated = await res.json(); // assume backend returns updated user/profile
+      auth.user = { ...(auth.user || {}), ...updated };
+      saveAuth();
+      paintProfileSummary();
+      renderStudentJobs();
+    }catch(err){
+      console.error(err);
+      alert("Error saving profile.");
+    }
+  };
+
+  // ======== ADMIN POST JOB ========
+  $("jobForm").onsubmit = async e => {
+    e.preventDefault();
+    const f = e.target;
+    const job = {
+      company: f.company.value.trim(),
+      role: f.role.value.trim(),
+      type: f.type.value,
+      location: f.location.value.trim(),
+      mincgpa: Number(f.mincgpa.value || 0),
+      reqskills: normSkills(f.reqskills.value),
+      desc: f.desc.value.trim()
+    };
+
+    try{
+      const res = await apiFetch("/api/jobs", {
+        method:"POST",
+        body: JSON.stringify(job)
+      });
+      if(!res.ok){
+        alert("Failed to create job.");
+        return;
+      }
+      f.reset();
+      renderAdminJobs();
+    }catch(err){
+      console.error(err);
+      alert("Error posting job.");
+    }
+  };
+
+  // ======== FILTER CONTROLS ========
+  $("q").oninput = () => renderStudentJobs();
+  $("typeFilter").onchange = () => renderStudentJobs();
+  $("clearFilters").onclick = () => {
+    $("q").value = "";
+    $("typeFilter").value = "";
+    renderStudentJobs();
+  };
+
+  // ======== SEED & WIPE (placeholder endpoints) ========
+  $("seed").onclick = async () => {
+    if(!confirm("Seed sample jobs on server?")) return;
+    try{
+      const res = await apiFetch("/api/debug/seed-jobs", { method:"POST" });
+      if(!res.ok){
+        alert("Seed endpoint failed. Ask backend team to implement /api/debug/seed-jobs.");
+        return;
+      }
+      alert("Sample jobs seeded.");
+      renderAdminJobs();
+      renderStudentJobs();
+    }catch(err){
+      console.error(err);
+      alert("Error calling seed API.");
+    }
+  };
+
+  $("wipe").onclick = async () => {
+    if(!confirm("Clear all jobs on server?")) return;
+    try{
+      const res = await apiFetch("/api/debug/clear", { method:"POST" });
+      if(!res.ok){
+        alert("Clear endpoint failed. Ask backend team to implement /api/debug/clear.");
+        return;
+      }
+      renderAdminJobs();
+      renderStudentJobs();
+    }catch(err){
+      console.error(err);
+      alert("Error calling clear API.");
+    }
+  };
+
+  // ======== INITIAL LOAD ========
+  (function init(){
+    loadAuth();
+    if(auth.token && auth.user){
+      if(auth.user.role === "admin"){
+        route("pageAdmin");
+        renderAdminJobs();
+      }else if(auth.user.role === "student"){
+        route("pageStudent");
+        paintProfileSummary();
+        renderStudentJobs();
+      }else{
+        route("pageRole");
+      }
+    }else{
+      route("pageRole");
+    }
+  })();
+</script>
+</body>
+</html>
