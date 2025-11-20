@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Campus Job Board</title>
+<style>
+  :root{
+  --bg:#f7f9fc;
+  --fg:#0d1b2a;
+  --muted:#556987;
+  --card:#ffffff;
+  --accent:#2563eb;
+  --border:#e5e7eb;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:system-ui,Segoe UI,Roboto,Arial;
+  background:var(--bg);
+  color:var(--fg);
+}
+
+header{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  background:#fff;
+  position:sticky;
+  top:0;
+  text-align:center;
+  z-index:10;
+}
+
+h1{
+  margin:0;
+  font-size:22px;
+  font-weight:600;
+}
+
+.wrap{
+  max-width:920px;
+  margin:auto;
+  padding:16px;
+}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:20px;
+  margin:10px 0;
+  animation:fadeUp 0.25s ease-out;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.grid{
+  display:grid;
+  gap:10px;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+}
+
+label{
+  font-size:12px;
+  color:var(--muted);
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  flex:1 1 200px;   /* used in profile + admin forms */
+}
+
+input,select,button,textarea{
+  padding:10px;
+  border:1px solid var(--border);
+  border-radius:10px;
+  font:inherit;
+  background:#fff;
+}
+
+button{
+  cursor:pointer;
+  transition:background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.primary{
+  background:var(--accent);
+  color:#fff;
+  border-color:var(--accent);
+}
+
+.primary:hover{
+  box-shadow:0 4px 10px rgba(37,99,235,0.35);
+  transform:translateY(-1px);
+}
+
+.ghost{
+  background:#fff;
+}
+
+.ghost:hover{
+  box-shadow:0 2px 6px rgba(15,23,42,0.08);
+}
+
+.muted{
+  color:var(--muted);
+  font-size:12px;
+}
+
+.hidden{display:none}
+
+.badge{
+  display:inline-block;
+  padding:2px 8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  font-size:12px;
+  margin-right:4px;
+  background:#fff;
+}
+
+.ok{color:#0b7a37}
+.no{color:#b4231a}
+
+.hr{
+  height:1px;
+  background:var(--border);
+  margin:10px 0;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* Center headings like “Choose your role” */
+.center-block{
+  text-align:center;
+}
+
+/* Vertical + centered role buttons */
+.vertical-center{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+}
+
+/* ───────────── LOGIN PAGE LAYOUT & SPACING ─────────── */
+
+/* Vertically center login area */
+#pageStudentLogin,
+#pageAdminLogin{
+  min-height:calc(100vh - 120px); /* header space */
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+/* compact login card padding */
+#pageStudentLogin.card,
+#pageAdminLogin.card{
+  padding-top:18px;
+  padding-bottom:18px;
+}
+
+/* heading spacing for login */
+#pageStudentLogin h3,
+#pageAdminLogin h3{
+  margin:0 0 10px 0;
+}
+
+/* vertical compact login form */
+.form-vertical{
+  display:flex;
+  flex-direction:column;
+  gap:6px;           /* very tight spacing */
+  width:100%;
+  max-width:360px;
+  margin:0 auto;
+}
+
+/* fix .field stretching inside login */
+#pageStudentLogin .field,
+#pageAdminLogin .field{
+  flex:0 0 auto !important;
+  margin-bottom:4px;
+}
+
+/* remove row gap inside login */
+#studentLoginForm.row,
+#adminLoginForm.row{
+  gap:0;
+  margin-top:0;
+}
+
+/* ───────────── ANIMATIONS ───────────── */
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(6px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Campus Job Board</h1>
+</header>
+
+<main class="wrap">
+
+  <!-- ========== ROLE CHOICE ========== -->
+  <section id="pageRole" class="card">
+    <h3 class="center-block">Choose your role</h3>
+    <div class="vertical-center">
+      <button class="primary" id="goStudent">Student</button>
+      <button class="primary" id="goAdmin">Recruiter / Admin</button>
+      <button class="ghost" id="seed">Seed sample data</button>
+      <button class="ghost" id="wipe">Clear all data</button>
+    </div>
+  </section>
+
+  <!-- ========== STUDENT LOGIN ========== -->
+  <section id="pageStudentLogin" class="card hidden">
+    <div class="topbar">
+      <h3>Student Login</h3>
+      <button class="ghost" id="backFromStudentLogin">Back</button>
+    </div>
+    <form id="studentLoginForm" class="form-vertical">
+      <div class="field"><label>Email</label><input name="email" type="email" required></div>
+      <div class="field"><label>Password</label><input name="pass" type="password" required></div>
+      <div class="row"><button class="primary" type="submit">Login</button></div>
+    </form>
+  </section>
+
+  <!-- ========== ADMIN LOGIN ========== -->
+  <section id="pageAdminLogin" class="card hidden">
+    <div class="topbar">
+      <h3>Recruiter / Admin Login</h3>
+      <button class="ghost" id="backFromAdminLogin">Back</button>
+    </div>
+    <form id="adminLoginForm" class="form-vertical">
+      <div class="field"><label>Company Email</label><input name="email" type="email" required></div>
+      <div class="field"><label>Password</label><input name="pass" type="password" required></div>
+      <div class="row"><button class="primary" type="submit">Login</button></div>
+    </form>
+  </section>
+
+  <!-- ========== STUDENT PAGE ========== -->
+  <section id="pageStudent" class="hidden">
+    <div class="card">
+      <div class="topbar">
+        <h3>My Profile</h3>
+        <div>
+          <div id="profileSummary" class="muted" style="margin-bottom:6px;">CGPA: — | Skills: —</div>
+          <button class="ghost" id="backFromStudentMain">Back</button>
+        </div>
+      </div>
+
+      <form id="studentProfileForm" class="row">
+        <div class="field"><label>Name</label><input name="name" required placeholder="Student Name"></div>
+        <div class="field"><label>CGPA (0–10)</label><input name="cgpa" type="number" step="0.01" min="0" max="10" required></div>
+        <div class="field"><label>Skills (comma separated)</label><input name="skills" placeholder="html, css, js"></div>
+        <div class="row"><button class="primary" type="submit">Save</button></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="topbar">
+        <h3>Jobs</h3>
+        <div class="row">
+          <input id="q" placeholder="Search jobs…">
+          <select id="typeFilter">
+            <option value="">All types</option>
+            <option>Internship</option>
+            <option>Full-time</option>
+            <option>Part-time</option>
+          </select>
+          <button class="ghost" id="clearFilters">Clear</button>
+        </div>
+      </div>
+      <div id="jobList" class="grid"></div>
+      <p id="jobsEmpty" class="muted hidden">No jobs yet.</p>
+    </div>
+  </section>
+
+  <!-- ========== ADMIN PAGE ========== -->
+  <section id="pageAdmin" class="hidden">
+    <div class="card">
+      <div class="topbar">
+        <h3>Post a Job</h3>
+        <button class="ghost" id="backFromAdminMain">Back</button>
+      </div>
+
+      <form id="jobForm">
+        <div class="row">
+          <div class="field"><label>Company</label><input name="company" required></div>
+          <div class="field"><label>Role</label><input name="role" required></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Type</label>
+            <select name="type">
+              <option>Internship</option>
+              <option>Full-time</option>
+              <option>Part-time</option>
+            </select>
+          </div>
+          <div class="field"><label>Location</label><input name="location" required></div>
+          <div class="field"><label>Min CGPA</label><input name="mincgpa" type="number" step="0.01" min="0" max="10" required></div>
+        </div>
+        <div class="field"><label>Required Skills (comma separated)</label><input name="reqskills" placeholder="html, css, js"></div>
+        <div class="field"><label>Description</label><textarea name="desc" rows="3"></textarea></div>
+        <div class="row"><button class="primary" type="submit">Publish</button></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Manage Jobs</h3>
+      <div id="adminJobs" class="grid"></div>
+      <p id="adminEmpty" class="muted hidden">No job postings yet.</p>
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ======== BASIC HELPERS ========
+  // Set your backend URL here
+  const API_BASE = "https://job-application-qtrd.onrender.com"; // Please update this URL if it changes
+
+  let auth = {
+    token: null,
+    user: null  // { id, name, role, cgpa, skills, ... }
+  };
+
+  // auth persistence
+  function loadAuth(){
+    const raw = localStorage.getItem("cc_auth");
+    if(!raw) return;
+    try{
+      const parsed = JSON.parse(raw);
+      if(parsed && parsed.token){
+        auth = parsed;
+      }
+    }catch(e){
+      console.error("Failed to parse auth", e);
+    }
+  }
+
+  function saveAuth(){
+    localStorage.setItem("cc_auth", JSON.stringify(auth));
+  }
+
+  function clearAuth(){
+    auth = { token:null, user:null };
+    localStorage.removeItem("cc_auth");
+  }
+
+  // generic fetch wrapper that adds JWT
+  async function apiFetch(path, options = {}){
+    const url = API_BASE + path;
+    const headers = options.headers ? {...options.headers} : {};
+
+    if (auth.token){
+      headers["Authorization"] = "Bearer " + auth.token;
+    }
+
+    if (options.body && !("Content-Type" in headers)){
+      headers["Content-Type"] = "application/json";
+    }
+
+    const res = await fetch(url, {...options, headers});
+
+    if(res.status === 401){
+      // token invalid / expired
+      clearAuth();
+      alert("Session expired. Please log in again.");
+      route("pageRole");
+      throw new Error("Unauthorized");
+    }
+    return res;
+  }
+
+  // ... rest of your JavaScript code unchanged ...
+</script>
+</body>
+</html>
